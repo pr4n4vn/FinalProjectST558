@@ -1,0 +1,110 @@
+---
+title: "EDA by Pranav Nair in ST558"
+format: html
+editor: visual
+---
+
+### Introduction
+
+In this document, we will do exploratory data analysis of our data set.
+
+The first step is to run the libraries necessary.
+
+```{r}
+library(readr)
+library(tidyverse)
+```
+
+The next step is to read in the raw data as an R tibble.
+
+```{r}
+diabetes_data <- read_csv("diabetes_012_health_indicators_BRFSS2015.csv", col_names = TRUE)
+str(diabetes_data)
+print(diabetes_data)
+```
+
+We see all these variables as numeric. However, many of them should actually be factor variables with meaningful level names.
+
+```{r}
+diabetes_data_fixed <- diabetes_data |>
+  mutate(Diabetes_012 = factor(Diabetes_012, levels = c(0,1,2), labels = c("No Diabetes", "Prediabetes", "Diabetes")),
+         HighBP = factor(HighBP, levels = c(0,1), labels = c("No", "Yes")),
+         HighChol = factor(HighChol, levels = c(0,1), labels = c("No", "Yes")),
+         CholCheck = factor(CholCheck, levels = c(0,1), labels = c("No", "Yes")),
+         Smoker = factor(Smoker, levels = c(0,1), labels = c("No", "Yes")),
+         Stroke = factor(Stroke, levels = c(0,1), labels = c("No", "Yes")),
+         HeartDiseaseorAttack = factor(HeartDiseaseorAttack, levels = c(0,1), labels = c("No", "Yes")),
+         PhysActivity = factor(PhysActivity, levels = c(0,1), labels = c("No", "Yes")),
+         Fruits = factor(Fruits, levels = c(0,1), labels = c("No", "Yes")),
+         Veggies = factor(Veggies, levels = c(0,1), labels = c("No", "Yes")),
+         HvyAlcoholConsump = factor(HvyAlcoholConsump, levels = c(0,1), labels = c("No", "Yes")),
+         AnyHealthcare = factor(AnyHealthcare, levels = c(0,1), labels = c("No", "Yes")),
+         NoDocbcCost = factor(NoDocbcCost, levels = c(0,1), labels = c("No", "Yes")),
+         DiffWalk = factor(DiffWalk, levels = c(0,1), labels = c("No", "Yes")),
+         Sex = factor(Sex, levels = c(0,1), labels = c("Female", "Male")),
+         Age = factor(Age, levels = 1:13, labels = c("18-24", "25-29", "30-34", "35-39", "40-44", "45-49", "50-54", "55-59", "60-64", "65-69", "70-74", "75-79", "80+")),
+         Education = factor(Education, levels = 1:6, labels = c("No Schooling", "Elementary", "Some High School", "High School Grad", "Some College", "College Grad")),
+         Income = factor(Income, levels = 1:8, labels = c("<$10,000", "$10,000-$15,000", "$15,000-$20,000", "$20,000-$25,000", "$25,000-$35,000", "$35,000-$50,000", "$50,000-$75,000", ">$75,000"))
+  )
+
+print(diabetes_data_fixed)
+```
+
+Now let's check the data for missingness.
+
+```{r}
+sum(is.na(diabetes_data_fixed))
+```
+
+No missing data! Now we can move on to the summarizations.
+
+```{r}
+#Showing summary statistics here.
+summary(diabetes_data_fixed)
+```
+
+Now, we can move on to the visualization plots.
+
+```{r}
+#Showing visualization plots
+#Distribution of diabetes status
+library(ggplot2)
+ggplot(diabetes_data_fixed, aes(x = Diabetes_012)) + 
+  geom_bar() + 
+  ggtitle("Distributions of Diabetes Status")
+```
+
+As shown in the graph, it looks like most of the participants (over 200,000) in the study do not have diabetes. There are approximately 35,000 people who do have diabnetes, and about 5,000 people who have prediabetes.
+
+```{r}
+#BMI by Diabetes
+ggplot(diabetes_data_fixed, aes(x = Diabetes_012, y = BMI)) + 
+  geom_boxplot() + 
+  ggtitle("BMI by Diabetes Status")
+```
+
+The IQR range of the BMI of people with diabetes is higher than the IQR range of the BMI of people without diabetes. Based off of this, it can be suggested that the BMI is higher for people with diabetes versus people who do not have diabetes.
+
+```{r}
+#Age distribution by Diabetes Status
+ggplot(diabetes_data_fixed, aes(x = Age, fill = Diabetes_012)) + 
+  geom_bar(position = "fill") + 
+  ggtitle("Age Distribution by Diabetes Status")
+
+
+```
+
+As shown in this stacked bar plot, the distribution looks relatively normal but skewed to the left as the age of participants increased. This suggests that the count of people with diabetes is connected to the age of participants; as the age increased, the likelihood of diabetes also increases.
+
+```{r}
+#Bar plot of physical activity by Diabetes status
+ggplot(diabetes_data_fixed, aes(x = PhysActivity, fill = Diabetes_012)) +
+  geom_bar(position = "fill") + 
+  ggtitle("Physical Activity by Diabetes Status")
+```
+
+This stacked bar plot shows the physical activity versus the count of diabetes. As shown, the count of diabetes is higher for people who do not participate in physical activity, and the count of diabetes is lower for people who do participate in physical activity.
+
+Below is a link to the model file.
+
+[Link to my Modeling](Modeling.html)
